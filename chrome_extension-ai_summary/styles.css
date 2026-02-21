@@ -1,0 +1,216 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px;
+  background-color: #f0f2f5;
+  color: #333;
+  line-height: 1.6;
+}
+
+h1, h2, h3 {
+  color: #2c3e50;
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+
+.field-group {
+  margin-bottom: 20px;
+}
+
+label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+input[type="text"], textarea, select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="text"]:focus, textarea:focus, select:focus {
+  border-color: #3498db;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background-color 0.2s, transform 0.1s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+button:hover {
+  background-color: #2980b9;
+  transform: translateY(-1px);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+button.secondary {
+  background-color: #95a5a6;
+}
+
+button.secondary:hover {
+  background-color: #7f8c8d;
+}
+
+button.danger {
+  background-color: #e74c3c;
+}
+
+button.danger:hover {
+  background-color: #c0392b;
+}
+
+.prompt-item {
+  border: 1px solid #eee;
+  padding: 15px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  background-color: #fff;
+  transition: box-shadow 0.2s;
+}
+
+.prompt-item:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.prompt-content {
+  white-space: pre-wrap;
+  font-family: 'Consolas', 'Monaco', monospace;
+  font-size: 0.85rem;
+  background: #f8f9fa;
+  padding: 8px;
+  margin-top: 8px;
+  border-radius: 4px;
+  color: #555;
+  border: 1px solid #eee;
+}
+
+/* Summary Page Specifics */
+.header-bar {
+  background: white;
+  padding: 15px 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  margin-bottom: 25px;
+}
+
+.controls {
+  background: white;
+  padding: 15px 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  margin-bottom: 25px;
+}
+
+.split-view {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+}
+
+.split-view > div {
+  flex: 1;
+  min-width: 0; /* Crucial for preventing flex items from overflowing */
+  display: flex;
+  flex-direction: column;
+}
+
+#extracted-content, #ai-response {
+  width: 100%;
+  height: 600px; /* Fixed height for scroll */
+  padding: 15px;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 0;
+  white-space: pre-wrap;
+  overflow-y: auto;
+  overflow-x: hidden; /* Prevent horizontal scroll on the container */
+  overflow-wrap: break-word; /* Ensure long words break */
+  font-size: 0.95rem;
+  line-height: 1.6;
+  box-sizing: border-box;
+}
+
+#ai-response {
+  background: #fdfdfd;
+  border-left: 4px solid #3498db;
+}
+
+/* Markdown Styles */
+#ai-response h1, #ai-response h2, #ai-response h3 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+#ai-response ul { 
+  padding-left: 20px; 
+}
+
+#ai-response li {
+  margin-bottom: 5px;
+}
+
+#ai-response code { 
+  background: #f0f0f0; 
+  padding: 2px 5px; 
+  border-radius: 3px; 
+  font-family: 'Consolas', monospace;
+  font-size: 0.9em;
+  color: #e74c3c;
+  word-break: break-all; /* Break long inline code */
+}
+
+#ai-response pre { 
+  background: #2d3436; 
+  color: #dfe6e9; 
+  padding: 15px; 
+  border-radius: 6px; 
+  overflow-x: auto; /* Scroll internally if needed */
+  margin: 10px 0;
+  max-width: 100%; /* Ensure it fits in container */
+}
+
+#ai-response pre code {
+  background: transparent;
+  color: inherit;
+  padding: 0;
+  border: none;
+  word-break: normal; /* Don't break code inside pre blocks unnecessarily */
+}

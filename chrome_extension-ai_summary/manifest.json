@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "AI Page Summarizer",
+  "version": "1.0",
+  "description": "Extracts page content and processes it with local AI (Ollama).",
+  "permissions": [
+    "contextMenus",
+    "scripting",
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "host_permissions": [
+    "http://localhost:11434/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
+  "action": {
+    "default_title": "AI Page Summarizer"
+  }
+}
