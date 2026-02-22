@@ -71,57 +71,58 @@ async function handleSummarize(info, tab) {
 function extractPageContent(ignoreTags, ignoreSelectors) {
   if (!document || !document.body) return "";
 
-  // Helper to check if element should be ignored
-  function shouldIgnore(element) {
-    const tagName = element.tagName.toLowerCase();
-    if (ignoreTags.includes(tagName)) return true;
+  function isVisible(el) {
+    if (el.nodeType !== Node.ELEMENT_NODE) return true; 
     
-    // Check selectors
+    const style = window.getComputedStyle(el);
+    return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0';
+  }
+
+  function shouldIgnore(el) {
+    if (el.nodeType !== Node.ELEMENT_NODE) return false;
+    
+    const tagName = el.tagName.toLowerCase();
+    if (ignoreTags && ignoreTags.includes(tagName)) return true;
+    
     if (ignoreSelectors && ignoreSelectors.length > 0) {
       for (const selector of ignoreSelectors) {
-        if (element.matches(selector)) return true;
+        if (el.matches(selector)) return true;
       }
     }
-    
     return false;
   }
 
-  // Clone body to avoid modifying the actual page
-  const clone = document.body.cloneNode(true);
-  
-  // Remove ignored elements
-  // We need to traverse and remove.
-  // A simple way is to use querySelectorAll for tags and selectors and remove them.
-  
-  // 1. Remove by Tag Name
-  if (ignoreTags && ignoreTags.length > 0) {
-    ignoreTags.forEach(tag => {
-      const elements = clone.querySelectorAll(tag);
-      elements.forEach(el => el.remove());
-    });
-  }
-
-  // 2. Remove by Selectors
-  if (ignoreSelectors && ignoreSelectors.length > 0) {
-    ignoreSelectors.forEach(selector => {
-      try {
-        const elements = clone.querySelectorAll(selector);
-        elements.forEach(el => el.remove());
-      } catch (e) {
-        console.warn('Invalid selector:', selector);
+  function traverse(node) {
+    if (node.nodeType === Node.TEXT_NODE) {
+      return node.textContent;
+    }
+    
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      if (shouldIgnore(node)) return "";
+      if (!isVisible(node)) return "";
+      
+      let text = "";
+      for (const child of node.childNodes) {
+        text += traverse(child);
       }
-    });
+      
+      // Add a space for block elements to prevent words merging
+      const tagName = node.tagName.toLowerCase();
+      const blockTags = [
+        'p', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'li', 'br', 'article', 'section', 
+        'header', 'footer', 'nav', 'aside', 'tr', 'ul', 'ol', 'blockquote', 'main', 
+        'pre', 'form', 'figure', 'figcaption', 'dl', 'dt', 'dd', 'table', 'tbody', 'thead', 'tfoot', 'td', 'th', 'caption'
+      ];
+      
+      if (blockTags.includes(tagName)) {
+        return " " + text + " ";
+      }
+      return text;
+    }
+    return "";
   }
   
-  // 3. Get text content
-  // innerText is better than textContent because it respects CSS styling (hidden elements)
-  // But innerText on a clone that isn't in the DOM might behave like textContent (no layout).
-  // However, we want "readable" text.
-  // textContent returns everything including hidden script contents if not removed.
-  // We already removed script/style tags.
-  
-  // Let's try to get textContent and clean it up.
-  let text = clone.innerText || clone.textContent || "";
+  let text = traverse(document.body);
   
   // Clean up whitespace
   text = text.replace(/\s+/g, ' ').trim();

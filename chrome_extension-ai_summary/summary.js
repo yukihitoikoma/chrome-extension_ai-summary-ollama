@@ -13,7 +13,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('ai-btn').addEventListener('click', handleAIButtonClick);
   
   document.getElementById('copy-content-btn').addEventListener('click', () => copyToClipboard('extracted-content'));
+  document.getElementById('download-content-btn').addEventListener('click', () => downloadContent('extracted-content'));
+  
   document.getElementById('copy-response-btn').addEventListener('click', () => copyToClipboard('ai-response'));
+  document.getElementById('download-response-btn').addEventListener('click', () => downloadContent('ai-response'));
 
   // Load Data
   let data = {};
@@ -46,12 +49,18 @@ document.addEventListener('DOMContentLoaded', async () => {
   const select = document.getElementById('prompt-select');
   select.innerHTML = ''; // Clear existing
   
+  // Add "No Selection" option
+  const noSelOpt = document.createElement('option');
+  noSelOpt.value = "custom";
+  noSelOpt.text = "No Selection (Custom Prompt)";
+  select.add(noSelOpt);
+
   if (!prompts || prompts.length === 0) {
-    const opt = document.createElement('option');
-    opt.text = "No prompts configured (Go to Settings)";
-    select.add(opt);
-    select.disabled = true;
-    // Add link to settings in status
+    // If no configured prompts, custom is default
+    select.value = "custom";
+    document.getElementById('custom-prompt-container').style.display = 'block';
+    
+    // Add link to settings in status if no prompts exist at all
     const status = document.getElementById('status');
     status.innerHTML = 'No system prompts found. <a href="#" id="link-settings">Configure in Settings</a>';
     document.getElementById('link-settings').addEventListener('click', (e) => {
@@ -59,30 +68,50 @@ document.addEventListener('DOMContentLoaded', async () => {
         chrome.runtime.openOptionsPage();
     });
   } else {
-    select.disabled = false;
-    // Add default empty option if no default is set? No, let's just select the default or the first one.
+    // Add configured prompts
     prompts.forEach(p => {
       const opt = document.createElement('option');
       opt.value = p.id;
       opt.text = p.title;
-      if (p.id === data.defaultPromptId) {
-        opt.selected = true;
-      }
       select.add(opt);
     });
     
-    // If no default was selected, select the first one
-    if (!select.value && prompts.length > 0) {
-        select.selectedIndex = 0;
+    // Set default
+    if (data.defaultPromptId && prompts.find(p => p.id === data.defaultPromptId)) {
+        select.value = data.defaultPromptId;
+    } else {
+        // Default to first real prompt if available, or custom
+        if (prompts.length > 0) {
+            select.selectedIndex = 1; // 0 is "No Selection"
+        } else {
+            select.value = "custom";
+        }
     }
   }
 
-  // Auto-run?
-  if (data.defaultPromptId && prompts.find(p => p.id === data.defaultPromptId)) {
-    // Small delay to ensure UI is ready
-    setTimeout(() => runAI(data.defaultPromptId), 100);
+  // Show/Hide custom prompt area based on initial selection
+  toggleCustomPrompt(select.value);
+
+  // Add change listener
+  select.addEventListener('change', (e) => {
+    toggleCustomPrompt(e.target.value);
+  });
+
+  // Auto-run? Only if a valid system prompt is selected as default.
+  // If custom is default (which shouldn't happen by id check above unless id matches "custom"?), don't auto-run.
+  if (data.defaultPromptId && select.value === data.defaultPromptId) {
+      setTimeout(() => runAI(data.defaultPromptId), 500);
   }
 });
+
+function toggleCustomPrompt(value) {
+    const container = document.getElementById('custom-prompt-container');
+    if (value === 'custom') {
+        container.style.display = 'block';
+    } else {
+        container.style.display = 'none';
+    }
+}
 
 function handleAIButtonClick() {
   if (abortController) {
@@ -96,9 +125,11 @@ function handleAIButtonClick() {
     const select = document.getElementById('prompt-select');
     const promptId = select.value;
     
-    if (!promptId || prompts.length === 0) {
-      document.getElementById('status').innerText = "Error: No system prompt selected.";
-      return;
+    // Allow if promptId is "custom" OR valid ID
+    if (!promptId) {
+       // Should not happen with current logic but just in case
+       document.getElementById('status').innerText = "Error: Please select a prompt mode.";
+       return;
     }
     
     runAI(promptId);
@@ -106,8 +137,25 @@ function handleAIButtonClick() {
 }
 
 async function runAI(promptId) {
-  const promptObj = prompts.find(p => p.id === promptId);
-  if (!promptObj) return;
+  let systemContent = "";
+  let userContent = currentExtractedText;
+
+  if (promptId === 'custom') {
+    // Custom Prompt Mode
+    const userPrompt = document.getElementById('user-prompt').value.trim();
+    if (userPrompt) {
+        userContent = `${userPrompt}\n\n■対象テキスト\n${currentExtractedText}`;
+    }
+    // systemContent remains empty
+  } else {
+    // System Prompt Mode
+    const promptObj = prompts.find(p => p.id === promptId);
+    if (!promptObj) {
+        document.getElementById('status').innerText = "Error: Selected prompt not found.";
+        return;
+    }
+    systemContent = promptObj.content;
+  }
 
   const btn = document.getElementById('ai-btn');
   const status = document.getElementById('status');
@@ -129,8 +177,8 @@ async function runAI(promptId) {
       },
       body: JSON.stringify({
         model: ollamaSettings.model,
-        prompt: currentExtractedText,
-        system: promptObj.content,
+        prompt: userContent,
+        system: systemContent,
         stream: false
       }),
       signal: abortController.signal
@@ -198,6 +246,37 @@ function copyToClipboard(elementId) {
     btn.innerText = "Copied!";
     setTimeout(() => btn.innerText = originalText, 1500);
   });
+}
+
+function downloadContent(elementId) {
+  let text = "";
+  let filename = "download.txt";
+  
+  if (elementId === 'ai-response') {
+    text = currentMarkdownResponse || ""; 
+    filename = "ai-summary.md";
+  } else {
+    const el = document.getElementById(elementId);
+    if (el) {
+        text = el.innerText || "";
+    }
+    filename = "extracted-content.txt";
+  }
+
+  if (!text) {
+    alert("No content to download.");
+    return;
+  }
+
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 100);
 }
 
 // Simple Markdown Parser

@@ -53,11 +53,18 @@
     <span id="status" class="status-bar"></span>
   </div>
 
+  <div id="custom-prompt-container" style="display: none; margin-bottom: 20px;">
+    <textarea id="user-prompt" rows="3" placeholder="Enter your custom prompt here... (e.g. Translate this to Japanese, Summarize in 3 bullet points)" style="width: 100%;"></textarea>
+  </div>
+
   <div class="split-view" style="display: flex; gap: 20px;">
     <div style="flex: 1;">
       <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
         <h3>Extracted Content</h3>
-        <button id="copy-content-btn" class="secondary" style="padding: 2px 8px; font-size: 12px;">Copy</button>
+        <div>
+          <button id="download-content-btn" class="secondary" style="padding: 2px 8px; font-size: 12px; margin-right: 5px;">Download</button>
+          <button id="copy-content-btn" class="secondary" style="padding: 2px 8px; font-size: 12px;">Copy</button>
+        </div>
       </div>
       <div id="extracted-content" contenteditable="true"></div>
     </div>
@@ -65,7 +72,10 @@
     <div style="flex: 1;">
       <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
         <h3>AI Response</h3>
-        <button id="copy-response-btn" class="secondary" style="padding: 2px 8px; font-size: 12px;">Copy</button>
+        <div>
+          <button id="download-response-btn" class="secondary" style="padding: 2px 8px; font-size: 12px; margin-right: 5px;">Download</button>
+          <button id="copy-response-btn" class="secondary" style="padding: 2px 8px; font-size: 12px;">Copy</button>
+        </div>
       </div>
       <div id="ai-response"></div>
     </div>
