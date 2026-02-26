@@ -170,7 +170,10 @@ async function runAI(promptId) {
   updateButtonState(true);
 
   try {
-    const response = await fetch(`${ollamaSettings.host}/api/generate`, {
+    // ユーザーが入力したホストURLから末尾のスラッシュを削除
+    const hostUrl = ollamaSettings.host.replace(/\/+$/, '');
+
+    const response = await fetch(`${hostUrl}/api/generate`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

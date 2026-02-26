@@ -214,3 +214,58 @@ button.danger:hover {
   border: none;
   word-break: normal; /* Don't break code inside pre blocks unnecessarily */
 }
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #121212;
+    color: #e0e0e0;
+  }
+  h1, h2, h3 {
+    color: #ffffff;
+  }
+  .container {
+    background: #1e1e1e;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  }
+  label {
+    color: #b0b0b0;
+  }
+  input[type="text"], textarea, select {
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    border: 1px solid #444;
+  }
+  input[type="text"]:focus, textarea:focus, select:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+  }
+  .prompt-item {
+    border: 1px solid #444;
+    background-color: #1e1e1e;
+  }
+  .prompt-content {
+    background: #2c2c2c;
+    color: #d0d0d0;
+    border: 1px solid #444;
+  }
+  .header-bar, .controls {
+    background: #1e1e1e;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+  }
+  #extracted-content, #ai-response {
+    background: #1e1e1e;
+    border: 1px solid #444;
+    color: #e0e0e0;
+  }
+  #ai-response {
+    background: #1a1a1a;
+    border-left: 4px solid #3498db;
+  }
+  #ai-response code {
+    background: #2c2c2c;
+    color: #ff7675;
+  }
+  #ai-response pre {
+    background: #000000;
+  }
+}
