@@ -207,7 +207,11 @@ async function runAI(promptId) {
       responseDiv.innerHTML += " [Aborted]";
     } else {
       status.innerText = "Error.";
-      responseDiv.innerHTML = `<span style="color:red">Error: ${err.message}</span>`;
+      let errorMsg = err.message;
+      if (errorMsg === 'Failed to fetch') {
+        errorMsg += "<br><br><strong>Troubleshooting:</strong><br>1. Is Ollama running on your machine?<br>2. Check if the Ollama Host in Settings matches your server (default is http://localhost:11434).<br>3. You may need to start Ollama with CORS enabled. Set the environment variable <code>OLLAMA_ORIGINS=\"*\"</code> before running Ollama.";
+      }
+      responseDiv.innerHTML = `<span style="color:red">Error: ${errorMsg}</span>`;
       console.error(err);
     }
   } finally {

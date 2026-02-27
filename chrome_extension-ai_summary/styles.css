@@ -177,6 +177,7 @@ button.danger:hover {
 #ai-response h1, #ai-response h2, #ai-response h3 {
   margin-top: 1.5em;
   margin-bottom: 0.5em;
+  font-size: 1em;
 }
 
 #ai-response ul { 
